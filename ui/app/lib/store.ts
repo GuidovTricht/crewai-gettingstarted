@@ -17,7 +17,6 @@ export interface ChatThread {
 interface ChatState {
   currentChatId: string | null
   chatHistory: Record<string, ChatThread>
-  isDarkMode: boolean
   setCurrentChat: (chatId: string | null) => void
   addMessage: (chatId: string, message: ChatMessage) => void
   createChat: (chatId: string, title?: string) => void
@@ -30,7 +29,6 @@ export const useChatStore = create<ChatState>()(
     (set) => ({
       currentChatId: null,
       chatHistory: {},
-      isDarkMode: false,
       
       setCurrentChat: (chatId) => set({ currentChatId: chatId }),
       

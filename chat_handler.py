@@ -1,8 +1,6 @@
 import json
 import logging
 from typing import Dict, List, Any, Optional, cast, TypedDict
-import threading
-import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -96,12 +94,6 @@ class ChatHandler:
         # Indicate that the crew is being analyzed
         logging.info("Analyzing crew and required inputs...")
         
-        # Start loading indicator in a separate thread
-        loading_complete = threading.Event()
-        loading_thread = threading.Thread(target=self._show_loading, args=(loading_complete,))
-        loading_thread.daemon = True
-        loading_thread.start()
-        
         try:
             # Generate crew chat inputs
             self.crew_chat_inputs = generate_crew_chat_inputs(
@@ -165,21 +157,6 @@ class ChatHandler:
             error_message = f"Error initializing chat handler: {str(e)}"
             logging.error(error_message)
             return error_message
-            
-        finally:
-            # Stop loading indicator
-            loading_complete.set()
-            if loading_thread.is_alive():
-                loading_thread.join(timeout=1.0)
-    
-    def _show_loading(self, event: threading.Event):
-        """Display animated loading indicator while processing."""
-        chars = "-\|/"
-        i = 0
-        while not event.is_set():
-            logging.debug(f"Processing... {chars[i % len(chars)]}")
-            i += 1
-            time.sleep(0.5)
     
     def _create_tool_function(self):
         """Create the tool function wrapper."""
@@ -202,12 +179,6 @@ class ChatHandler:
         
         # Add user message to history
         self.messages.append({"role": "user", "content": user_message})
-        
-        # Start loading indicator in a separate thread
-        loading_complete = threading.Event()
-        loading_thread = threading.Thread(target=self._show_loading, args=(loading_complete,))
-        loading_thread.daemon = True
-        loading_thread.start()
         
         try:
             # Ensure chat_llm is initialized - log minimal info
@@ -353,8 +324,3 @@ class ChatHandler:
             }
             logging.debug("Returning error result")
             return result
-        finally:
-            # Stop loading indicator
-            loading_complete.set()
-            if loading_thread.is_alive():
-                loading_thread.join(timeout=1.0)

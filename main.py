@@ -20,7 +20,6 @@ app.add_middleware(
 
 # Global state
 chat_handler = None
-chat_handlers: Dict[str, ChatHandler] = {}
 chat_threads: Dict[str, Dict[str, List]] = {}
 
 
